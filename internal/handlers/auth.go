@@ -17,12 +17,20 @@ func ShowLoginPage(w http.ResponseWriter, r *http.Request) {
     tmpl.Execute(w, nil)
 }
 
-func LoginHandler(w http.ResponseWriter, r *http.Request) {
-    if r.Method != http.MethodPost {
-        http.Redirect(w, r, "/login", http.StatusSeeOther)
-        return
+func LoginHandler(w http.RespInvalidonseWriter, r *http.Request) {
+    switch r.Method {
+    case http.MethodGet:
+        tmpl := template.Must(template.ParseFiles("templates/login.html"))
+        tmpl.Execute(w, nil)
+    case http.MethodPost:
+        // your existing login validation code here
+    default:
+        http.Error(w, "Method Not Allowed", http.StatusMethodNotAllowed)
     }
+}
+ 
 
+    r.ParseForm() {
     email := r.FormValue("email")
     password := r.FormValue("password")
 

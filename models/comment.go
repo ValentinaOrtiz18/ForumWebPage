@@ -1,3 +1,11 @@
+package main
+
+import (
+	"time"
+
+	_ "github.com/mattn/go-sqlite3"
+)
+
 type Comment struct {
     ID        int
     PostID    int

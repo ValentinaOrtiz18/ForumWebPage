@@ -1,3 +1,26 @@
+package main
+
+import (
+	"database/sql"
+)
+
+var db *sql.DB
+
+func init() {
+    var err error 
+    db, err = sql.Open("sqlite3", "database.db")
+    if err != nil {
+        panic(err)
+    }
+}
+
+type Post struct {
+    ID        int
+    Title     string
+    Content   string
+    CreatedAt string
+}
+
 func AddVote(userID, postID, commentID, voteType int) error {
     _, err := db.Exec(`
         INSERT OR REPLACE INTO votes (user_id, post_id, comment_id, type)
@@ -33,3 +56,5 @@ func GetLikedPosts(userID int) ([]Post, error) {
     }
     return posts, nil
 }
+
+
