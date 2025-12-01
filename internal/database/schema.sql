@@ -1,3 +1,4 @@
+
 CREATE TABLE IF NOT EXISTS comments (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     post_id INTEGER NOT NULL,
@@ -74,3 +75,10 @@ CREATE TABLE IF NOT EXISTS dislikes (
     FOREIGN KEY (post_id) REFERENCES posts(id),
     UNIQUE (user_id, post_id)
 );
+
+_, err := DB.Exec(schema)
+	if err != nil {
+		panic("Failed to create tables: " + err.Error())
+	}
+}
+
