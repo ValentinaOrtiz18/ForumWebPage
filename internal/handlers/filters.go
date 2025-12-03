@@ -22,7 +22,7 @@ func FilterPostsHandler(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
-		posts, err := database.GetLikedPosts(userID)
+		posts, err := database.GetAllPosts(post[])
 		if err != nil {
 			http.Error(w, "Could not load liked posts", http.StatusInternalServerError)
 			return

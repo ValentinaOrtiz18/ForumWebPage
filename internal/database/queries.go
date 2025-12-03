@@ -54,7 +54,6 @@ func InitDB(path string) *sql.DB {
 		log.Fatal("Failed to connect to database:", err)
 	}
 
-	createTables()
 	return DB
 }
 
@@ -183,12 +182,29 @@ func GetCommentsByPostID(postID int) ([]Comment, error) {
 }
 
 // ------------------- Likes / Dislikes Functions -------------------
+func GetLikedPosts(userID int) ([]Post, error) {
+	rows, err := DB.Query(`
+        SELECT p.id, p.user_id, p.title, p.content, p.created_at
+        FROM posts p
+        JOIN likes l ON p.id = l.post_id
+        WHERE l.user_id = ?
+        ORDER BY p.created_at DESC
+    `, userID)
 
-func GetLikePosts(userID, postID int) error {
-	_, err := DB.Exec(`INSERT OR IGNORE INTO likes (user_id, post_id) VALUES (?, ?)`, userID, postID)
-	// remove dislike if exists
-	DB.Exec(`DELETE FROM dislikes WHERE user_id = ? AND post_id = ?`, userID, postID)
-	return err
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	var posts []Post
+	for rows.Next() {
+		var p Post
+		if err := rows.Scan(&p.ID, &p.UserID, &p.Title, &p.Content, &p.CreatedAt); err != nil {
+			return nil, err
+		}
+		posts = append(posts, p)
+	}
+	return posts, nil
 }
 
 func DislikePost(userID, postID int) error {
@@ -265,4 +281,30 @@ func GetPostsByCategory(categoryID int) ([]Post, error) {
 		posts = append(posts, p)
 	}
 	return posts, nil
+}
+
+func GetCategoriesByPostID(postID int) ([]Category, error) {
+	rows, err := DB.Query(`
+		SELECT c.id, c.name
+		FROM categories c
+		JOIN post_categories pc ON c.id = pc.category_id
+		WHERE pc.post_id = ?
+	`, postID)
+
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	var categories []Category
+
+	for rows.Next() {
+		var cat Category
+		if err := rows.Scan(&cat.ID, &cat.Name); err != nil {
+			return nil, err
+		}
+		categories = append(categories, cat)
+	}
+
+	return categories, nil
 }
