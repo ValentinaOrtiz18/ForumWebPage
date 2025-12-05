@@ -17,16 +17,18 @@ func ShowLoginPage(w http.ResponseWriter, r *http.Request) {
 }
 
 func LoginHandler(w http.ResponseWriter, r *http.Request) {
-	switch r.Method {
-	case http.MethodGet:
+	if r.Method == http.MethodGet {
 		tmpl := template.Must(template.ParseFiles("templates/login.html"))
 		tmpl.Execute(w, nil)
-	case http.MethodPost:
-		// your existing login validation code here
-	default:
-		http.Error(w, "Method Not Allowed", http.StatusMethodNotAllowed)
+		return // <-- THIS FIXES THE PROBLEM
 	}
 
+	if r.Method != http.MethodPost {
+		http.Error(w, "Method Not Allowed", http.StatusMethodNotAllowed)
+		return
+	}
+
+	// POST request continues here
 	email := r.FormValue("email")
 	password := r.FormValue("password")
 
@@ -52,13 +54,13 @@ func LoginHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	cookie := &http.Cookie{
+	http.SetCookie(w, &http.Cookie{
 		Name:     "session_token",
 		Value:    sessionID,
 		Expires:  expiration,
 		HttpOnly: true,
-	}
-	http.SetCookie(w, cookie)
+	})
+
 	http.Redirect(w, r, "/", http.StatusSeeOther)
 }
 

@@ -7,13 +7,44 @@ import (
 	"strconv"
 )
 
-func PostHandler(w http.ResponseWriter, r *http.Request) {
+func ViewPostHandler(w http.ResponseWriter, r *http.Request) {
 	postIDStr := r.URL.Query().Get("id")
 	postID, err := strconv.Atoi(postIDStr)
 	if err != nil {
 		http.Error(w, "Invalid post ID", http.StatusBadRequest)
 		return
 	}
+
+	func CreatePostHandler(w http.ResponseWriter, r *http.Request) {
+    if r.Method != http.MethodPost {
+        http.Error(w, "Method Not Allowed", http.StatusMethodNotAllowed)
+        return
+    }
+
+    cookie, err := r.Cookie("session_token")
+    if err != nil {
+        http.Redirect(w, r, "/login", http.StatusSeeOther)
+        return
+    }
+
+    userID, valid := database.GetUserIDBySession(cookie.Value)
+    if !valid {
+        http.Redirect(w, r, "/login", http.StatusSeeOther)
+        return
+    }
+
+    title := r.FormValue("title")
+    content := r.FormValue("content")
+
+    _, err = database.CreatePost(userID, title, content)
+    if err != nil {
+        http.Error(w, "Failed to create post", http.StatusInternalServerError)
+        return
+    }
+
+    http.Redirect(w, r, "/", http.StatusSeeOther)
+}
+
 
 	post, err := database.GetPostByID(postID)
 	if err != nil {

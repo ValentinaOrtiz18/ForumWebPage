@@ -14,7 +14,8 @@ func main() {
 	http.HandleFunc("/", handlers.ShowLoginPage)
 	http.HandleFunc("/login", handlers.LoginHandler)
 	http.HandleFunc("/logout", handlers.LogoutHandler)
-	http.HandleFunc("/post/create", handlers.PostHandler)
+	http.HandleFunc("/post", handlers.ViewPostHandler)
+	http.HandleFunc("/post/create", handlers.CreatePostHandler)
 	http.HandleFunc("/comment/create", handlers.CreateCommentHandler)
 	http.HandleFunc("/register", handlers.RegisterHandler)
 
