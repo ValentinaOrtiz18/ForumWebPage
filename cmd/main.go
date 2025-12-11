@@ -8,10 +8,10 @@ import (
 
 func main() {
 	// Initialize the database
-	database.InitDB("forum.db")
+	database.InitDB("forum.DB")
 
 	// Set up routes
-	http.HandleFunc("/", handlers.ShowLoginPage)
+	http.HandleFunc("/", handlers.HomeHandler)
 	http.HandleFunc("/login", handlers.LoginHandler)
 	http.HandleFunc("/logout", handlers.LogoutHandler)
 	http.HandleFunc("/post", handlers.ViewPostHandler)
