@@ -13,7 +13,6 @@ func main() {
 
 	// Set up routes
 	http.HandleFunc("/", handlers.IndexHandler)
-	http.HandleFunc("/index", handlers.HomeHandler)
 	http.HandleFunc("/login", handlers.LoginHandler)
 	http.HandleFunc("/logout", handlers.LogoutHandler)
 	http.HandleFunc("/post", handlers.ViewPostHandler)

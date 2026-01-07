@@ -197,6 +197,7 @@ func GetLikedPosts(userID int) ([]Post, error) {
 	defer rows.Close()
 
 	var posts []Post
+
 	for rows.Next() {
 		var p Post
 		if err := rows.Scan(&p.ID, &p.UserID, &p.Title, &p.Content, &p.CreatedAt); err != nil {
@@ -204,6 +205,7 @@ func GetLikedPosts(userID int) ([]Post, error) {
 		}
 		posts = append(posts, p)
 	}
+
 	return posts, nil
 }
 
@@ -307,4 +309,28 @@ func GetCategoriesByPostID(postID int) ([]Category, error) {
 	}
 
 	return categories, nil
+}
+
+func GetUserPosts(userID int) ([]Post, error) {
+	rows, err := DB.Query(`
+		SELECT id, user_id, title, content, created_at
+		FROM posts
+		WHERE user_id = ?
+		ORDER BY created_at DESC
+	`, userID)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	var posts []Post
+	for rows.Next() {
+		var p Post
+		if err := rows.Scan(&p.ID, &p.UserID, &p.Title, &p.Content, &p.CreatedAt); err != nil {
+			return nil, err
+		}
+		posts = append(posts, p)
+	}
+
+	return posts, nil
 }
