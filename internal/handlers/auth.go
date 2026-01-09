@@ -2,6 +2,7 @@ package handlers
 
 import (
 	"database/sql"
+	"fmt"
 	"forum/internal/database"
 	"html/template"
 	"net/http"
@@ -10,6 +11,25 @@ import (
 	"github.com/google/uuid"
 	"golang.org/x/crypto/bcrypt"
 )
+
+func getAuthenticatedUser(r *http.Request) (*database.User, error) {
+	cookie, err := r.Cookie("session_token")
+	if err != nil {
+		return nil, fmt.Errorf("not logged in")
+	}
+
+	userID, valid := database.GetUserIDBySession(cookie.Value)
+	if !valid {
+		return nil, fmt.Errorf("invalid session")
+	}
+
+	user, err := database.GetUserByID(userID)
+	if err != nil {
+		return nil, fmt.Errorf("user not found")
+	}
+
+	return &user, nil
+}
 
 func ShowLoginPage(w http.ResponseWriter, r *http.Request) {
 	tmpl := template.Must(template.ParseFiles("templates/login.html"))

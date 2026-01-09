@@ -1,0 +1,89 @@
+body {
+    margin: 0;
+    padding: 0;
+    font-family: system-ui, Arial, sans-serif;
+    background: #111827;
+    color: #e5e7eb;
+}
+
+/* ===== Navbar ===== */
+
+nav {
+    background: #1f2937;
+    padding: 12px 18px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+nav a {
+    color: #e5e7eb;
+    text-decoration: none;
+    margin-right: 12px;
+}
+
+nav a:hover {
+    color: #38bdf8;
+}
+
+/* ===== Page Container ===== */
+
+.container {
+    width: 900px;
+    margin: 25px auto;
+    padding: 18px;
+}
+
+/* ===== Buttons ===== */
+
+button, .btn {
+    background: #2563eb;
+    color: white;
+    border: none;
+    padding: 8px 14px;
+    border-radius: 6px;
+    cursor: pointer;
+}
+
+button:hover, .btn:hover {
+    background: #1d4ed8;
+}
+
+/* ===== Cards / Posts ===== */
+
+.card {
+    background: #020617;
+    border: 1px solid #1f2937;
+    border-radius: 10px;
+    padding: 14px;
+    margin-bottom: 14px;
+}
+
+.card h2 {
+    margin-top: 0;
+}
+
+/* ===== Forms ===== */
+
+input, textarea {
+    width: 100%;
+    padding: 8px;
+    margin-top: 8px;
+    margin-bottom: 10px;
+    border-radius: 6px;
+    border: 1px solid #374151;
+    background: #020617;
+    color: #e5e7eb;
+}
+
+input:focus, textarea:focus {
+    outline: 1px solid #60a5fa;
+}
+
+/* ===== Comments Section ===== */
+
+.comment {
+    border-top: 1px solid #1f2937;
+    padding-top: 8px;
+    margin-top: 8px;
+}

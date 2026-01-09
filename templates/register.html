@@ -64,11 +64,6 @@
     <div class="register-container">
         <h2>Register</h2>
 
-        <!-- Error message placeholder -->
-        {{if .Error}}
-        <div class="error">{{.Error}}</div>
-        {{end}}
-
         <form method="POST" action="/register">
             <label for="email">Email</label>
             <input type="email" name="email" id="email" placeholder="Enter your email" required>

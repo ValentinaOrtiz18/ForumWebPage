@@ -184,11 +184,10 @@ func GetCommentsByPostID(postID int) ([]Comment, error) {
 // ------------------- Likes / Dislikes Functions -------------------
 func GetLikedPosts(userID int) ([]Post, error) {
 	rows, err := DB.Query(`
-        SELECT p.id, p.user_id, p.title, p.content, p.created_at
-        FROM posts p
-        JOIN likes l ON p.id = l.post_id
-        WHERE l.user_id = ?
-        ORDER BY p.created_at DESC
+        SELECT posts.id, posts.title, posts.content, posts.user_id, posts.created_at
+        FROM posts
+        JOIN likes ON likes.post_id = posts.id
+        WHERE likes.user_id = ?
     `, userID)
 
 	if err != nil {
@@ -197,13 +196,15 @@ func GetLikedPosts(userID int) ([]Post, error) {
 	defer rows.Close()
 
 	var posts []Post
+
 	for rows.Next() {
 		var p Post
-		if err := rows.Scan(&p.ID, &p.UserID, &p.Title, &p.Content, &p.CreatedAt); err != nil {
+		if err := rows.Scan(&p.ID, &p.Title, &p.Content, &p.UserID, &p.CreatedAt); err != nil {
 			return nil, err
 		}
 		posts = append(posts, p)
 	}
+
 	return posts, nil
 }
 
@@ -307,4 +308,28 @@ func GetCategoriesByPostID(postID int) ([]Category, error) {
 	}
 
 	return categories, nil
+}
+
+func GetUserPosts(userID int) ([]Post, error) {
+	rows, err := DB.Query(`
+		SELECT id, user_id, title, content, created_at
+		FROM posts
+		WHERE user_id = ?
+		ORDER BY created_at DESC
+	`, userID)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	var posts []Post
+	for rows.Next() {
+		var p Post
+		if err := rows.Scan(&p.ID, &p.UserID, &p.Title, &p.Content, &p.CreatedAt); err != nil {
+			return nil, err
+		}
+		posts = append(posts, p)
+	}
+
+	return posts, nil
 }

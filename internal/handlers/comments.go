@@ -2,26 +2,21 @@ package handlers
 
 import (
 	"fmt"
+	"forum/internal/database"
 	"net/http"
 	"strconv"
-
-	"forum/internal/database"
 )
 
+// Handler to create comments
 func CreateCommentHandler(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodPost {
 		http.Error(w, "Method Not Allowed", http.StatusMethodNotAllowed)
 		return
 	}
 
-	session, err := r.Cookie("session_token")
+	// Call the helper from auth.go
+	user, err := getAuthenticatedUser(r)
 	if err != nil {
-		http.Redirect(w, r, "/login", http.StatusSeeOther)
-		return
-	}
-
-	userID, valid := database.GetUserIDBySession(session.Value)
-	if !valid {
 		http.Redirect(w, r, "/login", http.StatusSeeOther)
 		return
 	}
@@ -34,8 +29,7 @@ func CreateCommentHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	content := r.FormValue("content")
-
-	err = database.CreateComment(userID, postID, content)
+	err = database.CreateComment(user.ID, postID, content)
 	if err != nil {
 		http.Error(w, "Failed to add comment", http.StatusInternalServerError)
 		return
