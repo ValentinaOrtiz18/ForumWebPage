@@ -1,7 +1,6 @@
 package handlers
 
 import (
-	"database/sql"
 	"fmt"
 	"forum/internal/database"
 	"html/template"
@@ -37,52 +36,54 @@ func ShowLoginPage(w http.ResponseWriter, r *http.Request) {
 }
 
 func LoginHandler(w http.ResponseWriter, r *http.Request) {
-	if r.Method == http.MethodGet {
-		tmpl := template.Must(template.ParseFiles("templates/login.html"))
-		tmpl.Execute(w, nil)
-		return // <-- THIS FIXES THE PROBLEM
-	}
+    if r.Method == http.MethodGet {
+        tmpl := template.Must(template.ParseFiles("./templates/login.html"))
+        tmpl.Execute(w, nil)
+        return
+    }
 
-	if r.Method != http.MethodPost {
-		http.Error(w, "Method Not Allowed", http.StatusMethodNotAllowed)
-		return
-	}
+    if r.Method != http.MethodPost {
+        http.Error(w, "Method Not Allowed", http.StatusMethodNotAllowed)
+        return
+    }
 
-	// POST request continues here
-	email := r.FormValue("email")
-	password := r.FormValue("password")
+    if err := r.ParseForm(); err != nil {
+        http.Error(w, "Invalid email or password", http.StatusBadRequest)
+        return
+    }
 
-	user, err := database.GetUserByEmail(email)
-	if err == sql.ErrNoRows {
-		http.Error(w, "Invalid email or password", http.StatusUnauthorized)
-		return
-	} else if err != nil {
-		http.Error(w, "Database error", http.StatusInternalServerError)
-		return
-	}
+    email := r.FormValue("email")
+    password := r.FormValue("password")
 
-	if bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(password)) != nil {
-		http.Error(w, "Invalid email or password", http.StatusUnauthorized)
-		return
-	}
+    user, err := database.GetUserByEmail(email)
+    if err != nil {
+        http.Error(w, "Invalid email or password", http.StatusUnauthorized)
+        return
+    }
 
-	sessionID := uuid.New().String()
-	expiration := time.Now().Add(2 * time.Hour)
-	err = database.CreateSession(user.ID, sessionID, expiration)
-	if err != nil {
-		http.Error(w, "Server error", http.StatusInternalServerError)
-		return
-	}
+    if bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(password)) != nil {
+        http.Error(w, "Invalid email or password", http.StatusUnauthorized)
+        return
+    }
 
-	http.SetCookie(w, &http.Cookie{
-		Name:     "session_token",
-		Value:    sessionID,
-		Expires:  expiration,
-		HttpOnly: true,
-	})
+    sessionID := uuid.New().String()
+    expiration := time.Now().Add(2 * time.Hour)
 
-	http.Redirect(w, r, "/", http.StatusSeeOther)
+    if err := database.CreateSession(user.ID, sessionID, expiration); err != nil {
+        http.Error(w, "Server error", http.StatusInternalServerError)
+        return
+    }
+
+    http.SetCookie(w, &http.Cookie{
+        Name:     "session_token",
+        Value:    sessionID,
+        Expires:  expiration,
+        HttpOnly: true,
+    })
+
+    http.Redirect(w, r, "/", http.StatusSeeOther)
 }
+
 
 func LogoutHandler(w http.ResponseWriter, r *http.Request) {
 	cookie, _ := r.Cookie("session_token")

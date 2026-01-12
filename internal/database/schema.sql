@@ -70,5 +70,5 @@ _, err := DB.Exec(schema)
 	if err != nil {
 		panic("Failed to create tables: " + err.Error())
 	}
-}
+
 

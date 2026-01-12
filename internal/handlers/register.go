@@ -4,28 +4,38 @@ import (
 	"forum/internal/database"
 	"html/template"
 	"net/http"
-
-	"golang.org/x/crypto/bcrypt"
 )
 
-func RegisterHandler(w http.ResponseWriter, r *http.Request) {
-	tmpl := template.Must(template.ParseFiles("templates/register.html"))
 
+func RegisterHandler(w http.ResponseWriter, r *http.Request) {
+	tmpl, err := template.ParseFiles("templates/register.html")
+	if err != nil {
+		http.Error(w, "Template error", http.StatusInternalServerError)
+		return
+	}
+
+	// ✅ ALLOW GET (this fixes the 405)
 	if r.Method == http.MethodGet {
 		tmpl.Execute(w, nil)
 		return
 	}
 
-	// POST request
+	// ❌ Block anything that is not POST
+	if r.Method != http.MethodPost {
+		http.Error(w, "Method Not Allowed", http.StatusMethodNotAllowed)
+		return
+	}
+
+	// POST logic
 	email := r.FormValue("email")
 	username := r.FormValue("username")
 	password := r.FormValue("password")
 
-	hashed, _ := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
-
-	err := database.CreateUser(email, username, string(hashed))
+	err = database.CreateUser(email, username, password)
 	if err != nil {
-		tmpl.Execute(w, map[string]string{"Error": "Email already exists"})
+		tmpl.Execute(w, map[string]string{
+			"Error": "Registration failed",
+		})
 		return
 	}
 
