@@ -3,24 +3,22 @@ package handlers
 import (
 	"html/template"
 	"net/http"
+	"forum/internal/database"
 )
 
 func HomeHandler(w http.ResponseWriter, r *http.Request) {
-	if r.URL.Path != "/" {
-		http.NotFound(w, r)
-		return
-	}
-
-
-	tmpl, err := template.ParseFiles("templates/index.html")
+	posts, err := database.GetAllPosts()
 	if err != nil {
-		http.Error(w, "Template error", http.StatusInternalServerError)
+		http.Error(w, "Failed to load posts", http.StatusInternalServerError)
 		return
 	}
 
-	err = tmpl.Execute(w, nil)
-	if err != nil {
-		http.Error(w, "Render error", http.StatusInternalServerError)
-		return
+	data := struct {
+		Posts []database.Post
+	}{
+		Posts: posts,
 	}
+
+	tmpl := template.Must(template.ParseFiles("templates/index.html"))
+	tmpl.Execute(w, data)
 }

@@ -2,77 +2,26 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Forum Home</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            margin: 20px;
-            background: #f4f4f4;
-        }
-
-        header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 30px;
-        }
-
-        a {
-            text-decoration: none;
-            color: #0077cc;
-        }
-
-        .btn {
-            padding: 8px 15px;
-            background: #0077cc;
-            color: white;
-            border-radius: 5px;
-        }
-
-        .btn:hover {
-            background: #005fa3;
-        }
-
-        .post {
-            background: white;
-            padding: 15px;
-            margin-bottom: 15px;
-            border-radius: 5px;
-        }
-
-        .post h2 {
-            margin-top: 0;
-        }
-    </style>
+    <title>Forum</title>
 </head>
-
 <body>
 
-<header>
-    <h1>Welcome to the Forum</h1>
-
-    <div>
-        <a class="btn" href="/login">Login</a>
-        <a class="btn" href="/register">Register</a>
-        <a class="btn" href="/post/create">New Post</a>
-    </div>
-</header>
-
-<hr>
-
-<h2>Recent Posts</h2>
+<h1>Forum Posts</h1>
 
 {{ if .Posts }}
     {{ range .Posts }}
-        <div class="post">
-            <h2><a href="/post?id={{ .ID }}">{{ .Title }}</a></h2>
+        <div style="border:1px solid #ccc; padding:10px; margin-bottom:10px;">
+            <h3>{{ .Title }}</h3>
             <p>{{ .Content }}</p>
-            <small>Posted on: {{ .CreatedAt }}</small>
+            <small>Posted by user {{ .UserID }} at {{ .CreatedAt }}</small>
         </div>
     {{ end }}
 {{ else }}
-    <p>No posts yet. Be the first to <a href="/post/create">create a post</a>!</p>
+    <p>No posts yet.</p>
 {{ end }}
+
+<a href="/login">Login</a> |
+<a href="/register">Register</a>
 
 </body>
 </html>

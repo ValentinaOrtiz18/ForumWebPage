@@ -9,7 +9,8 @@ import (
 
 func main() {
 	// Initialize the database
-	database.InitDB("forum.db")
+database.InitDB("./forum.db")
+
 
 	// Set up routes
 	http.HandleFunc("/", handlers.HomeHandler)
