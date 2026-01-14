@@ -27,6 +27,6 @@ database.InitDB("./forum.db")
 		),
 	)
 	// Start server
-	log.Fatal(http.ListenAndServe(":8080", nil))
+	log.Fatal(http.ListenAndServe(":3030", nil))
 
 }
