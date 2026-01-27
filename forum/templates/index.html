@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Forum - Home</title>
+    <link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body>
+    <!-- Navigation Bar -->
+    <nav>
+        <div class="nav-left">
+            <a href="/" class="logo">📝 Forum</a>
+        </div>
+        <div class="nav-right">
+            {{ if .LoggedIn }}
+                <span>Welcome, {{ .User.Username }}!</span>
+                <a href="/post/create" class="btn-primary">+ New Post</a>
+                <a href="/logout">Logout</a>
+            {{ else }}
+                <a href="/login">Login</a>
+                <a href="/register">Register</a>
+            {{ end }}
+        </div>
+    </nav>
+
+    <!-- Main Container -->
+    <div class="container">
+        <div class="layout">
+            <!-- Sidebar -->
+            <aside class="sidebar">
+                <h3>Filters</h3>
+                <ul class="filter-list">
+                    <li><a href="/">All Posts</a></li>
+                    {{ if .LoggedIn }}
+                        <li><a href="/filter?filter=myposts">My Posts</a></li>
+                        <li><a href="/filter?filter=liked">Liked Posts</a></li>
+                    {{ end }}
+                </ul>
+
+                {{ if .Categories }}
+                <h3>Categories</h3>
+                <ul class="filter-list">
+                    {{ range .Categories }}
+                        <li><a href="/filter?category={{ .ID }}">{{ .Name }}</a></li>
+                    {{ end }}
+                </ul>
+                {{ end }}
+            </aside>
+
+            <!-- Main Content -->
+            <main class="main-content">
+                <h1>Forum Posts</h1>
+
+                {{ if .Posts }}
+                    {{ range .Posts }}
+                        <article class="card post-card">
+                            <h2><a href="/post?id={{ .ID }}">{{ .Title }}</a></h2>
+                            <p class="post-preview">{{ .Content }}</p>
+                            <div class="post-meta">
+                                <span>👤 User #{{ .UserID }}</span>
+                                <span>🕒 {{ .CreatedAt.Format "Jan 02, 2006 15:04" }}</span>
+                            </div>
+                        </article>
+                    {{ end }}
+                {{ else }}
+                    <div class="empty-state">
+                        <p>📭 No posts yet. Be the first to create one!</p>
+                        {{ if .LoggedIn }}
+                            <a href="/post/create" class="btn-primary">Create Post</a>
+                        {{ end }}
+                    </div>
+                {{ end }}
+            </main>
+        </div>
+    </div>
+</body>
+</html>

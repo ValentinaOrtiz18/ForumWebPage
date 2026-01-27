@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ .Post.Title }} - Forum</title>
+    <link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body>
+    <!-- Navigation Bar -->
+    <nav>
+        <div class="nav-left">
+            <a href="/" class="logo">📝 Forum</a>
+        </div>
+        <div class="nav-right">
+            {{ if .LoggedIn }}
+                <span>Welcome, {{ .User.Username }}!</span>
+                <a href="/post/create" class="btn-primary">+ New Post</a>
+                <a href="/logout">Logout</a>
+            {{ else }}
+                <a href="/login">Login</a>
+                <a href="/register">Register</a>
+            {{ end }}
+        </div>
+    </nav>
+
+    <!-- Main Container -->
+    <div class="container">
+        <a href="/" class="back-link">← Back to all posts</a>
+
+        <!-- Post Content -->
+        <article class="card post-detail">
+            <h1>{{ .Post.Title }}</h1>
+            
+            <div class="post-meta">
+                <span>👤 {{ .Author.Username }}</span>
+                <span>🕒 {{ .Post.CreatedAt.Format "Jan 02, 2006 15:04" }}</span>
+            </div>
+
+            {{ if .Categories }}
+            <div class="categories">
+                {{ range .Categories }}
+                    <span class="category-tag">{{ .Name }}</span>
+                {{ end }}
+            </div>
+            {{ end }}
+
+            <div class="post-content">
+                <p>{{ .Post.Content }}</p>
+            </div>
+
+            <!-- Like/Dislike Buttons -->
+            <div class="vote-section">
+                {{ if .LoggedIn }}
+                    <form action="/post/like" method="POST" class="vote-form">
+                        <input type="hidden" name="post_id" value="{{ .Post.ID }}">
+                        <button type="submit" class="btn-vote btn-like">👍 Like ({{ .Likes }})</button>
+                    </form>
+                    <form action="/post/dislike" method="POST" class="vote-form">
+                        <input type="hidden" name="post_id" value="{{ .Post.ID }}">
+                        <button type="submit" class="btn-vote btn-dislike">👎 Dislike ({{ .Dislikes }})</button>
+                    </form>
+                {{ else }}
+                    <span class="vote-count">👍 {{ .Likes }} Likes</span>
+                    <span class="vote-count">👎 {{ .Dislikes }} Dislikes</span>
+                {{ end }}
+            </div>
+        </article>
+
+        <!-- Comments Section -->
+        <section class="comments-section">
+            <h2>Comments ({{ len .Comments }})</h2>
+
+            {{ if .Comments }}
+                {{ range .Comments }}
+                    <div class="card comment">
+                        <div class="comment-meta">
+                            <strong>User #{{ .UserID }}</strong>
+                            <span class="comment-date">{{ .CreatedAt.Format "Jan 02, 15:04" }}</span>
+                        </div>
+                        <p>{{ .Content }}</p>
+                    </div>
+                {{ end }}
+            {{ else }}
+                <p class="no-comments">No comments yet. Be the first to comment!</p>
+            {{ end }}
+
+            <!-- Add Comment Form -->
+            {{ if .LoggedIn }}
+                <form action="/comment/create" method="POST" class="comment-form">
+                    <input type="hidden" name="post_id" value="{{ .Post.ID }}">
+                    <textarea name="content" placeholder="Write your comment..." required></textarea>
+                    <button type="submit" class="btn-primary">Post Comment</button>
+                </form>
+            {{ else }}
+                <p class="login-prompt"><a href="/login">Login</a> to add a comment</p>
+            {{ end }}
+        </section>
+    </div>
+</body>
+</html>
