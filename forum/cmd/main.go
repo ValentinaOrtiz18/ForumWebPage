@@ -31,6 +31,6 @@ func main() {
 		),
 	)
 
-	log.Println("Server starting on http://localhost:3030")
-	log.Fatal(http.ListenAndServe(":3030", nil))
+	log.Println("Server starting on http://localhost:8080")
+	log.Fatal(http.ListenAndServe(":8080", nil))
 }
