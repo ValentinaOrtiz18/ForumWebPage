@@ -1,0 +1,4 @@
+2026/01/27 20:06:00 USING DATABASE NOW: ./forum.db
+2026/01/27 20:06:00 Database tables created successfully
+2026/01/27 20:06:00 Default categories initialized
+2026/01/27 20:06:00 Server starting on http://localhost:3030
