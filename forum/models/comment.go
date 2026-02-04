@@ -13,6 +13,8 @@ type Comment struct {
 	Username  string
 	Content   string
 	CreatedAt time.Time
+	Likes     int 
+    Dislikes  int  
 }
 
 func CreateComment(userID, postID int, content string) error {

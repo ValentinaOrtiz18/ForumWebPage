@@ -33,8 +33,11 @@ type Comment struct {
 	ID        int
 	PostID    int
 	UserID    int
+	Username  string
 	Content   string
 	CreatedAt time.Time
+	Likes     int
+	Dislikes  int
 }
 
 type Category struct {
@@ -197,10 +200,19 @@ func CreateComment(userID, postID int, content string) error {
 
 func GetCommentsByPostID(postID int) ([]Comment, error) {
 	rows, err := DB.Query(`
-        SELECT id, post_id, user_id, content, created_at
-        FROM comments
-        WHERE post_id = ?
-        ORDER BY created_at ASC
+        SELECT 
+            c.id, 
+            c.post_id, 
+            c.user_id, 
+            u.username,
+            c.content, 
+            c.created_at,
+            COALESCE((SELECT COUNT(*) FROM comment_likes WHERE comment_id = c.id), 0) as likes,
+            COALESCE((SELECT COUNT(*) FROM comment_dislikes WHERE comment_id = c.id), 0) as dislikes
+        FROM comments c
+        JOIN users u ON c.user_id = u.id
+        WHERE c.post_id = ?
+        ORDER BY c.created_at ASC
     `, postID)
 	if err != nil {
 		return nil, err
@@ -210,7 +222,7 @@ func GetCommentsByPostID(postID int) ([]Comment, error) {
 	comments := []Comment{}
 	for rows.Next() {
 		var c Comment
-		if err := rows.Scan(&c.ID, &c.PostID, &c.UserID, &c.Content, &c.CreatedAt); err != nil {
+		if err := rows.Scan(&c.ID, &c.PostID, &c.UserID, &c.Username, &c.Content, &c.CreatedAt, &c.Likes, &c.Dislikes); err != nil {
 			return nil, err
 		}
 		comments = append(comments, c)
